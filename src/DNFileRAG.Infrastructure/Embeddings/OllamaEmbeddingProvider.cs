@@ -59,7 +59,12 @@ public class OllamaEmbeddingProvider : IEmbeddingProvider
             JsonOptions,
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogError("Ollama API error: {StatusCode} - {Error}", response.StatusCode, errorContent);
+            throw new HttpRequestException($"Ollama API error: {response.StatusCode} - {errorContent}");
+        }
 
         var result = await response.Content.ReadFromJsonAsync<OllamaEmbeddingResponse>(JsonOptions, cancellationToken);
 
