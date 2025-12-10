@@ -4,6 +4,24 @@ A .NET 9-powered, real-time file-driven RAG (Retrieval-Augmented Generation) eng
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
+[![CI](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/DNFileRAG.Infrastructure.svg)](https://www.nuget.org/packages/DNFileRAG.Infrastructure)
+
+## Installation
+
+### NuGet Package
+
+```bash
+dotnet add package DNFileRAG.Infrastructure
+```
+
+### From Source
+
+```bash
+git clone https://github.com/MLidstrom/DNFileRAG.git
+cd DNFileRAG
+dotnet build
+```
 
 ## Features
 
@@ -32,7 +50,7 @@ docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
 ### 2. Clone and Build
 
 ```bash
-git clone https://github.com/yourusername/DNFileRAG.git
+git clone https://github.com/MLidstrom/DNFileRAG.git
 cd DNFileRAG
 dotnet build
 ```

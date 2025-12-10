@@ -1,5 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- NuGet Package Properties -->
+    <PackageId>DNFileRAG.Infrastructure</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>DNFileRAG Contributors</Authors>
+    <Description>A .NET RAG (Retrieval-Augmented Generation) engine with support for multiple embedding and LLM providers, document parsing, and vector search</Description>
+    <PackageTags>rag;ai;embeddings;vector-search;llm;dotnet;openai;ollama;anthropic;qdrant</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/MLidstrom/DNFileRAG</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MLidstrom/DNFileRAG.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Enable Source Link for debugging -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\DNFileRAG.Core\DNFileRAG.Core.csproj" />
   </ItemGroup>
@@ -13,11 +41,5 @@
     <PackageReference Include="PdfPig" Version="0.1.12" />
     <PackageReference Include="Qdrant.Client" Version="1.16.1" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
 
 </Project>

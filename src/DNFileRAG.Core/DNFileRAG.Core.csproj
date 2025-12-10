@@ -4,6 +4,28 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- NuGet Package Properties -->
+    <PackageId>DNFileRAG.Core</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>DNFileRAG Contributors</Authors>
+    <Description>Core interfaces and models for DNFileRAG - a .NET RAG (Retrieval-Augmented Generation) engine</Description>
+    <PackageTags>rag;ai;embeddings;vector-search;llm;dotnet</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/MLidstrom/DNFileRAG</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MLidstrom/DNFileRAG.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Enable Source Link for debugging -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

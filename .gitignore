@@ -12,7 +12,9 @@ obj/
 
 # NuGet
 *.nupkg
+*.snupkg
 packages/
+nupkg/
 
 # Windows
 nul
