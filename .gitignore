@@ -1,3 +1,23 @@
+# .NET build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# IDE
+.vs/
+*.user
+*.suo
+
+# NuGet
+*.nupkg
+packages/
+
+# Windows
+nul
+Thumbs.db
+*.tmp
 
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md

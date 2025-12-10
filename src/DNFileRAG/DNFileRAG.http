@@ -1,0 +1,6 @@
+@DNFileRAG_HostAddress = http://localhost:5087
+
+GET {{DNFileRAG_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
