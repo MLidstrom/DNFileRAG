@@ -4,7 +4,7 @@ A .NET 9-powered, real-time file-driven RAG (Retrieval-Augmented Generation) eng
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
-[![CI](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml)
+[![CI](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/DNFileRAG.Infrastructure.svg)](https://www.nuget.org/packages/DNFileRAG.Infrastructure)
 
 ## Installation
