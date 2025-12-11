@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: dnfilerag-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  dnfilerag:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dnfilerag-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./documents:/app/data/documents:ro
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Qdrant__Host=qdrant
+      - Qdrant__Port=6333
+      - Qdrant__CollectionName=DNFileRAG
+      - Qdrant__VectorSize=1024
+      - Embedding__Provider=Ollama
+      - Embedding__Ollama__BaseUrl=http://ollama:11434
+      - Embedding__Ollama__Model=mxbai-embed-large
+      - Llm__Provider=Ollama
+      - Llm__Ollama__BaseUrl=http://ollama:11434
+      - Llm__Ollama__Model=llama3.2
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Optional: Ollama for local inference
+  ollama:
+    image: ollama/ollama:latest
+    container_name: dnfilerag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    profiles:
+      - local-llm
+
+volumes:
+  qdrant-data:
+  ollama-data:

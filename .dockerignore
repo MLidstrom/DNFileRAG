@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vs
+.vscode
+.idea
+*.user
+*.suo
+
+# Build outputs
+**/bin
+**/obj
+**/out
+
+# Test results
+**/TestResults
+**/coverage
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Development files
+.internal/
+.claude/
+examples/
+
+# Local data
+**/data/
+documents/
+
+# NuGet packages
+nupkg/
+*.nupkg
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
