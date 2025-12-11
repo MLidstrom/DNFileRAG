@@ -27,7 +27,7 @@ Please be respectful and constructive in all interactions. We welcome contributo
 ### Submitting Pull Requests
 
 1. **Fork** the repository
-2. **Create a branch** from `main`:
+2. **Create a branch** from `master`:
    ```bash
    git checkout -b feature/your-feature-name
    ```

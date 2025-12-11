@@ -125,9 +125,125 @@ DNFileRAG/
 │       ├── Parsers/               # Document parsers
 │       ├── Services/              # Core services
 │       └── VectorStore/           # Qdrant integration
-└── tests/
-    └── DNFileRAG.Tests/           # Unit tests
+├── tests/
+│   └── DNFileRAG.Tests/           # Unit tests
+└── examples/
+    └── HelpChat/                  # Static HTML/TypeScript chat client
 ```
+
+## Using as a NuGet Package
+
+Add DNFileRAG to your own .NET application to build custom RAG solutions.
+
+### 1. Install the Package
+
+```bash
+dotnet add package DNFileRAG.Infrastructure
+```
+
+### 2. Add Configuration
+
+Add to your `appsettings.json`:
+
+```json
+{
+  "Embedding": {
+    "Provider": "Ollama",
+    "Ollama": {
+      "BaseUrl": "http://localhost:11434",
+      "Model": "mxbai-embed-large"
+    }
+  },
+  "Llm": {
+    "Provider": "Ollama",
+    "Ollama": {
+      "BaseUrl": "http://localhost:11434",
+      "Model": "llama3.2"
+    }
+  },
+  "Qdrant": {
+    "Host": "localhost",
+    "Port": 6333,
+    "CollectionName": "documents",
+    "VectorSize": 1024
+  },
+  "Rag": {
+    "DefaultTopK": 5,
+    "DefaultTemperature": 0.2,
+    "DefaultMaxTokens": 512,
+    "MinRelevanceScore": 0.6,
+    "SystemPrompt": "You are a helpful assistant for our company. Answer questions based only on the provided context. Be concise and professional."
+  }
+}
+```
+
+### 3. Register Services
+
+In your `Program.cs`:
+
+```csharp
+using DNFileRAG.Core.Configuration;
+using DNFileRAG.Core.Interfaces;
+using DNFileRAG.Infrastructure.Embeddings;
+using DNFileRAG.Infrastructure.Llm;
+using DNFileRAG.Infrastructure.Services;
+using DNFileRAG.Infrastructure.VectorStore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Bind all configuration sections
+builder.Services.Configure<EmbeddingOptions>(builder.Configuration.GetSection("Embedding"));
+builder.Services.Configure<LlmOptions>(builder.Configuration.GetSection("Llm"));
+builder.Services.Configure<QdrantOptions>(builder.Configuration.GetSection("Qdrant"));
+builder.Services.Configure<RagOptions>(builder.Configuration.GetSection("Rag"));
+
+// Register DNFileRAG services
+builder.Services.AddEmbeddingServices();
+builder.Services.AddLlmProviders();
+builder.Services.AddHttpClient<IVectorStore, QdrantVectorStore>();
+builder.Services.AddSingleton<IRagEngine, RagEngine>();
+```
+
+### 4. Use in Your Code
+
+```csharp
+using DNFileRAG.Core.Interfaces;
+using DNFileRAG.Core.Models;
+
+public class MyService
+{
+    private readonly IRagEngine _ragEngine;
+
+    public MyService(IRagEngine ragEngine)
+    {
+        _ragEngine = ragEngine;
+    }
+
+    public async Task<RagResponse> AskAsync(string question)
+    {
+        var query = new RagQuery
+        {
+            Query = question,
+            TopK = 5,
+            Temperature = 0.2f,
+            MaxTokens = 512
+        };
+
+        return await _ragEngine.QueryAsync(query);
+    }
+}
+```
+
+The `IRagEngine` handles embedding generation, vector search, context building, and LLM prompting automatically using your configured `SystemPrompt`.
+
+### Available Providers
+
+| Provider | Embeddings | LLM | Local |
+|----------|:----------:|:---:|:-----:|
+| OpenAI | ✅ | ✅ | ❌ |
+| Azure OpenAI | ✅ | ✅ | ❌ |
+| Anthropic | ❌ | ✅ | ❌ |
+| Ollama | ✅ | ✅ | ✅ |
 
 ## Configuration
 
