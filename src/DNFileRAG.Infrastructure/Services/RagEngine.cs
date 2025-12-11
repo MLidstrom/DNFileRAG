@@ -63,13 +63,29 @@ public class RagEngine : IRagEngine
         _logger.LogDebug("Searching vector store for top {TopK} results", topK);
         var searchResults = await _vectorStore.SearchAsync(queryEmbedding, topK, searchFilters, cancellationToken);
 
+        // Filter by minimum relevance score
+        if (_options.MinRelevanceScore > 0)
+        {
+            var originalCount = searchResults.Count;
+            searchResults = searchResults
+                .Where(r => r.Score >= _options.MinRelevanceScore)
+                .ToList();
+
+            if (originalCount > searchResults.Count)
+            {
+                _logger.LogDebug("Filtered {Removed} results below minimum relevance score {MinScore}",
+                    originalCount - searchResults.Count, _options.MinRelevanceScore);
+            }
+        }
+
         if (searchResults.Count == 0)
         {
-            _logger.LogInformation("No relevant documents found for query");
+            _logger.LogInformation("No relevant documents found for query (threshold: {MinScore})", _options.MinRelevanceScore);
             return CreateNoResultsResponse(query, stopwatch, guardrailsApplied);
         }
 
-        _logger.LogDebug("Found {Count} relevant chunks", searchResults.Count);
+        _logger.LogDebug("Found {Count} relevant chunks (scores: {MinScore:F2} - {MaxScore:F2})",
+            searchResults.Count, searchResults.Min(r => r.Score), searchResults.Max(r => r.Score));
 
         // Build prompt with context
         var systemPrompt = _options.SystemPrompt;

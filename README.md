@@ -155,10 +155,31 @@ For fully local development without API keys:
 1. Install [Ollama](https://ollama.ai/)
 2. Pull required models:
    ```bash
-   ollama pull nomic-embed-text
+   ollama pull mxbai-embed-large  # Recommended: 1024 dims, stable
    ollama pull llama3.2
    ```
 3. Set providers to `Ollama` in configuration
+4. Configure vector size to match embedding model:
+
+| Embedding Model | Vector Size | Notes |
+|-----------------|-------------|-------|
+| `mxbai-embed-large` | 1024 | Recommended for stability |
+| `nomic-embed-text` | 768 | May crash on some PDFs (Ollama Windows bug) |
+| `all-minilm` | 384 | Smaller, faster |
+
+### Query Guardrails
+
+DNFileRAG includes relevance score filtering to prevent off-topic queries:
+
+```json
+{
+  "Rag": {
+    "MinRelevanceScore": 0.6
+  }
+}
+```
+
+Queries with no documents above the threshold return a "no relevant information" response without calling the LLM, saving cost and preventing hallucination
 
 ## Docker
 

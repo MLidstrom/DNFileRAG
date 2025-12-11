@@ -45,10 +45,13 @@ public class OllamaEmbeddingProvider : IEmbeddingProvider
     {
         ArgumentNullException.ThrowIfNull(text);
 
+        // Sanitize text to remove problematic characters that can crash Ollama
+        var sanitizedText = SanitizeTextForEmbedding(text);
+
         var request = new OllamaEmbeddingRequest
         {
             Model = _options.Model,
-            Prompt = text
+            Prompt = sanitizedText
         };
 
         _logger.LogDebug("Generating embedding using Ollama model {Model}", _options.Model);
@@ -113,6 +116,48 @@ public class OllamaEmbeddingProvider : IEmbeddingProvider
         "mxbai-embed-large" => 1024,
         _ => 768 // Default for unknown models
     };
+
+    /// <summary>
+    /// Sanitizes text to remove problematic characters that can crash Ollama's embedding model.
+    /// PDFs often contain invisible control characters, zero-width spaces, and other characters
+    /// that can cause issues with embedding models.
+    /// </summary>
+    private static string SanitizeTextForEmbedding(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        var sb = new System.Text.StringBuilder(text.Length);
+
+        foreach (var c in text)
+        {
+            // Keep printable ASCII, standard whitespace, and common Unicode letters/numbers
+            if (c >= 32 && c < 127) // Printable ASCII
+            {
+                sb.Append(c);
+            }
+            else if (c == '\n' || c == '\r' || c == '\t') // Standard whitespace
+            {
+                sb.Append(c);
+            }
+            else if (char.IsLetterOrDigit(c) || char.IsPunctuation(c) || char.IsSymbol(c))
+            {
+                // Keep Unicode letters, digits, punctuation (including Swedish å, ä, ö)
+                sb.Append(c);
+            }
+            else if (char.IsWhiteSpace(c))
+            {
+                // Replace other whitespace (non-breaking space, etc.) with regular space
+                sb.Append(' ');
+            }
+            // Skip control characters, zero-width characters, and other problematic chars
+        }
+
+        // Normalize multiple spaces to single space
+        var result = System.Text.RegularExpressions.Regex.Replace(sb.ToString(), @"[ ]+", " ");
+
+        return result.Trim();
+    }
 
     #region Request/Response Models
 
