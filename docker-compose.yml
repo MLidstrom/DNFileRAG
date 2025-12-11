@@ -1,27 +1,90 @@
 version: '3.8'
 
+# DNFileRAG - Fully Self-Contained Local RAG Engine
+#
+# Usage:
+#   docker-compose up -d
+#
+# First start will download ~5GB of AI models (one-time).
+# After startup, API available at http://localhost:8080
+#
+# Put your documents in ./documents folder to index them.
+
 services:
+  # Vector database for semantic search
   qdrant:
     image: qdrant/qdrant:latest
     container_name: dnfilerag-qdrant
     ports:
       - "6333:6333"
-      - "6334:6334"
     volumes:
       - qdrant-data:/qdrant/storage
-    environment:
-      - QDRANT__SERVICE__GRPC_PORT=6334
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: 10s
+      timeout: 5s
+      retries: 5
       start_period: 10s
+    restart: unless-stopped
 
+  # Local LLM inference engine
+  ollama:
+    image: ollama/ollama:latest
+    container_name: dnfilerag-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # One-time model download (runs once, then exits)
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: dnfilerag-ollama-init
+    volumes:
+      - ollama-data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Waiting for Ollama to be ready..."
+        until curl -s http://ollama:11434/api/tags > /dev/null 2>&1; do
+          sleep 2
+        done
+        echo "Ollama is ready. Checking models..."
+
+        # Check and pull embedding model
+        if ! curl -s http://ollama:11434/api/tags | grep -q "mxbai-embed-large"; then
+          echo "Pulling mxbai-embed-large (embedding model)..."
+          curl -X POST http://ollama:11434/api/pull -d '{"name": "mxbai-embed-large"}'
+        else
+          echo "mxbai-embed-large already available"
+        fi
+
+        # Check and pull LLM model
+        if ! curl -s http://ollama:11434/api/tags | grep -q "llama3.2"; then
+          echo "Pulling llama3.2 (LLM model)..."
+          curl -X POST http://ollama:11434/api/pull -d '{"name": "llama3.2"}'
+        else
+          echo "llama3.2 already available"
+        fi
+
+        echo "All models ready!"
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  # DNFileRAG API service
   dnfilerag:
     build:
       context: .
       dockerfile: Dockerfile
+    image: dnfilerag:latest
     container_name: dnfilerag-api
     ports:
       - "8080:8080"
@@ -39,27 +102,26 @@ services:
       - Llm__Provider=Ollama
       - Llm__Ollama__BaseUrl=http://ollama:11434
       - Llm__Ollama__Model=llama3.2
+      - Rag__MinRelevanceScore=0.6
+      - Rag__DefaultTopK=5
+      - Rag__DefaultTemperature=0.2
     depends_on:
       qdrant:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
-
-  # Optional: Ollama for local inference
-  ollama:
-    image: ollama/ollama:latest
-    container_name: dnfilerag-ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama-data:/root/.ollama
-    profiles:
-      - local-llm
+    restart: unless-stopped
 
 volumes:
   qdrant-data:
+    name: dnfilerag-qdrant-data
   ollama-data:
+    name: dnfilerag-ollama-data

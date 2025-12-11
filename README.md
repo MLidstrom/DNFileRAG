@@ -297,10 +297,40 @@ DNFileRAG includes relevance score filtering to prevent off-topic queries:
 
 Queries with no documents above the threshold return a "no relevant information" response without calling the LLM, saving cost and preventing hallucination
 
-## Docker
+## Docker (Easiest Way)
+
+Run DNFileRAG with a single command - no installation required except Docker:
 
 ```bash
+# Clone and start (first run downloads ~5GB of AI models)
+git clone https://github.com/MLidstrom/DNFileRAG.git
+cd DNFileRAG
 docker-compose up -d
+
+# Put your documents here
+mkdir -p documents
+cp /path/to/your/files/* documents/
+
+# Query via API
+curl -X POST http://localhost:8080/api/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What are the key topics in my documents?"}'
+```
+
+**What's included:**
+- Qdrant (vector database)
+- Ollama (local LLM - no API keys needed)
+- DNFileRAG API
+- Auto-downloads AI models on first start
+
+**Endpoints:**
+- API: http://localhost:8080
+- Health: http://localhost:8080/api/health
+
+**Stop/Remove:**
+```bash
+docker-compose down        # Stop services
+docker-compose down -v     # Stop and remove data
 ```
 
 ## Contributing
