@@ -6,6 +6,7 @@ A static HTML/TypeScript chat interface that connects to DNFileRAG API.
 
 ```
 HelpChat/
+├── assets/         # Static assets (logo, images)
 ├── index.html      # Chat UI
 ├── chat.ts         # TypeScript client for DNFileRAG API
 ├── chat.js         # Compiled JavaScript (generated)
