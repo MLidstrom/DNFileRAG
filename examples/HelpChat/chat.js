@@ -41,7 +41,7 @@ class HelpChat {
         div.textContent = text;
         return div.innerHTML;
     }
-    addMessage(content, isUser, sources = [], metadata) {
+    addMessage(content, isUser) {
         if (this.isFirstMessage) {
             this.chatMessages.innerHTML = '';
             this.isFirstMessage = false;
@@ -49,10 +49,7 @@ class HelpChat {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
         let html = `<div class="message-content">${this.escapeHtml(content)}</div>`;
-        // Intentionally do not display sources/citations in this demo UI.
-        if (!isUser && metadata) {
-            html += `<div class="message-meta">${metadata.model} | ${metadata.latencyMs}ms</div>`;
-        }
+        // Intentionally do not display sources/citations or metadata in this demo UI.
         messageDiv.innerHTML = html;
         this.chatMessages.appendChild(messageDiv);
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
@@ -106,7 +103,7 @@ class HelpChat {
             }
             const data = await response.json();
             this.removeTypingIndicator();
-            this.addMessage(data.answer, false, data.sources, data.metadata);
+            this.addMessage(data.answer, false);
         }
         catch (error) {
             this.removeTypingIndicator();

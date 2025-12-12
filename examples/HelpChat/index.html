@@ -43,7 +43,7 @@
             align-items: center;
             gap: 12px;
             min-width: 0;
-            color: #f8fafc;
+            color: #0f172a;
             text-decoration: none;
         }
 
@@ -60,7 +60,7 @@
         }
 
         .logo-text strong {
-            font-size: 0.98rem;
+            font-size: 1.1rem;
             letter-spacing: 0.2px;
             white-space: nowrap;
             overflow: hidden;
@@ -68,7 +68,7 @@
         }
 
         .logo-text span {
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             opacity: 0.8;
             white-space: nowrap;
             overflow: hidden;
@@ -270,8 +270,20 @@
         .chat-launcher .bubble {
             width: 34px;
             height: 34px;
+            min-width: 34px;
+            min-height: 34px;
+            flex-shrink: 0;
             border-radius: 12px;
             background: #0ea5e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-launcher .bubble svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
         }
 
         .chat-launcher strong {
@@ -319,8 +331,8 @@
             width: 18px;
             height: 18px;
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
+            border: none;
+            background: transparent;
             cursor: nwse-resize;
             z-index: 5;
             display: grid;
@@ -334,15 +346,15 @@
             content: "";
             width: 10px;
             height: 10px;
-            border-top: 2px solid #64748b;
-            border-left: 2px solid #64748b;
+            border-top: 2px solid #94a3b8;
+            border-left: 2px solid #94a3b8;
             border-radius: 2px;
             transform: rotate(0deg);
-            opacity: 0.9;
+            opacity: 0.6;
         }
 
-        .resize-handle-nw:hover {
-            background: #f1f5f9;
+        .resize-handle-nw:hover::before {
+            opacity: 1;
         }
 
         .chat-header {
@@ -366,9 +378,21 @@
         .brand-mark {
             width: 34px;
             height: 34px;
+            min-width: 34px;
+            min-height: 34px;
+            flex-shrink: 0;
             border-radius: 12px;
             background: #0ea5e9;
             box-shadow: 0 10px 24px rgba(14, 165, 233, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-mark svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
         }
 
         .brand-text {
@@ -618,6 +642,10 @@
         <header class="topbar">
             <a class="logo" href="#" aria-label="Northwind Atlas">
                 <img class="logo-img" src="assets/northwind-atlas-logo.svg" alt="Northwind Atlas">
+                <div class="logo-text">
+                    <strong>Northwind Atlas</strong>
+                    <span>Customer Support</span>
+                </div>
             </a>
             <nav class="nav" aria-label="Primary navigation">
                 <a href="#features">Features</a>
@@ -674,7 +702,13 @@
 
     <!-- Chat launcher + modal (uses the same IDs expected by chat.js) -->
     <button class="chat-launcher" id="openChat" type="button" aria-label="Open help chat">
-        <span class="bubble" aria-hidden="true"></span>
+        <span class="bubble" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 11.5C21 16.75 16.75 21 11.5 21C9.81 21 8.21 20.58 6.8 19.83L3 21L4.17 17.2C3.42 15.79 3 14.19 3 12.5C3 7.25 7.25 3 12.5 3H13C17.97 3 22 7.03 22 12V12.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 10.5H16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 14.5H13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </span>
         <strong>Help</strong>
     </button>
 
@@ -683,7 +717,13 @@
             <div class="resize-handle-nw" id="resizeHandleNW" title="Resize" aria-label="Resize chat"></div>
             <div class="chat-header">
                 <div class="brand">
-                    <div class="brand-mark" aria-hidden="true"></div>
+                    <div class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 11.5C21 16.75 16.75 21 11.5 21C9.81 21 8.21 20.58 6.8 19.83L3 21L4.17 17.2C3.42 15.79 3 14.19 3 12.5C3 7.25 7.25 3 12.5 3H13C17.97 3 22 7.03 22 12V12.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 10.5H16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M8 14.5H13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
                     <div class="brand-text">
                         <h1>Northwind Support</h1>
                         <p>Ask a question and we’ll help</p>
