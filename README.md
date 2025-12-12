@@ -83,13 +83,13 @@ Edit `src/DNFileRAG/appsettings.json`:
     "Host": "localhost",
     "Port": 6333,
     "CollectionName": "DNFileRAG",
-    "VectorSize": 1536
+    "VectorSize": 1024
   },
   "Embedding": {
     "Provider": "Ollama",
     "Ollama": {
       "BaseUrl": "http://localhost:11434",
-      "Model": "nomic-embed-text"
+      "Model": "mxbai-embed-large"
     }
   },
   "Llm": {
