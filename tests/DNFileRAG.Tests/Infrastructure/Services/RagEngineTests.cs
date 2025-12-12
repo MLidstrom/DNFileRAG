@@ -49,7 +49,7 @@ public class RagEngineTests
         var query = new RagQuery { Query = "What is the capital of France?" };
         var queryEmbedding = new float[] { 0.1f, 0.2f, 0.3f };
         var searchResults = CreateSearchResults(2);
-        var llmResponse = "The capital of France is Paris. [Source 1]";
+        var llmResponse = "The capital of France is Paris.";
 
         _embeddingProviderMock
             .Setup(x => x.GenerateEmbeddingAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -100,7 +100,7 @@ public class RagEngineTests
 
         // Assert
         Assert.NotNull(response);
-        Assert.Contains("couldn't find any relevant information", response.Answer);
+        Assert.Contains("Sorry", response.Answer);
         Assert.Empty(response.Sources);
         Assert.Equal("test-model", response.Meta.Model);
 
@@ -366,16 +366,16 @@ public class RagEngineTests
 
         // Assert
         Assert.NotNull(capturedUserPrompt);
-        Assert.Contains("CONTEXT", capturedUserPrompt);
-        Assert.Contains("Source 1", capturedUserPrompt);
-        Assert.Contains("Source 2", capturedUserPrompt);
-        Assert.Contains("test-file-0.txt", capturedUserPrompt);
-        Assert.Contains("test-file-1.txt", capturedUserPrompt);
+        Assert.Contains("INFORMATION", capturedUserPrompt);
+        Assert.Contains("Item 1:", capturedUserPrompt);
+        Assert.Contains("Item 2:", capturedUserPrompt);
+        Assert.Contains("Test content from chunk 0", capturedUserPrompt);
+        Assert.Contains("Test content from chunk 1", capturedUserPrompt);
         Assert.Contains("What is the weather?", capturedUserPrompt);
     }
 
     [Fact]
-    public async Task QueryAsync_WithPageNumbers_IncludesPageInfoInPrompt()
+    public async Task QueryAsync_WithPageNumbers_IncludesPageInfoInSources()
     {
         // Arrange
         var query = new RagQuery { Query = "Test query" };
@@ -406,18 +406,16 @@ public class RagEngineTests
             .Setup(x => x.SearchAsync(It.IsAny<float[]>(), It.IsAny<int>(), It.IsAny<SearchFilters>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(searchResults);
 
-        string? capturedUserPrompt = null;
         _llmProviderMock
             .Setup(x => x.GenerateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<LlmGenerationOptions>(), It.IsAny<CancellationToken>()))
-            .Callback<string, string, LlmGenerationOptions, CancellationToken>((s, u, o, c) => capturedUserPrompt = u)
             .ReturnsAsync("Answer");
 
         // Act
-        await _ragEngine.QueryAsync(query);
+        var response = await _ragEngine.QueryAsync(query);
 
-        // Assert
-        Assert.NotNull(capturedUserPrompt);
-        Assert.Contains("Page 5", capturedUserPrompt);
+        // Assert - page number is in sources metadata, not in prompt
+        Assert.Single(response.Sources);
+        Assert.Equal(5, response.Sources[0].PageNumber);
     }
 
     [Fact]
