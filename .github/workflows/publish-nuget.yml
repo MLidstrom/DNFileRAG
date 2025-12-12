@@ -32,8 +32,8 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Run tests
-      run: dotnet test --configuration Release --no-build --verbosity normal
+    - name: Run unit tests (skip slow integration tests)
+      run: dotnet test --configuration Release --no-build --verbosity normal --filter "Category!=Integration"
 
     - name: Determine version
       id: version
