@@ -29,16 +29,32 @@ dotnet build
 
 Skip Docker/Testcontainers integration tests:
 
+- **Windows (PowerShell):**
+
 ```bash
 dotnet test .\DNFileRAG.sln -c Release --filter "Category!=Integration"
+```
+
+- **macOS/Linux (bash/zsh):**
+
+```bash
+dotnet test ./DNFileRAG.sln -c Release --filter "Category!=Integration"
 ```
 
 ### Full (includes integration tests)
 
 Runs everything (some tests start Docker containers via Testcontainers, so this is slower):
 
+- **Windows (PowerShell):**
+
 ```bash
 dotnet test .\DNFileRAG.sln -c Release
+```
+
+- **macOS/Linux (bash/zsh):**
+
+```bash
+dotnet test ./DNFileRAG.sln -c Release
 ```
 
 ## Features
@@ -57,61 +73,80 @@ dotnet test .\DNFileRAG.sln -c Release
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Qdrant](https://qdrant.tech/) vector database (Docker recommended)
-- One of: OpenAI API key, Azure OpenAI, or [Ollama](https://ollama.ai/) for local inference
+- One of: OpenAI API key, Azure OpenAI, or [Ollama](https://ollama.ai/) for local inference (recommended for local dev)
 
-### 1. Start Qdrant
+### Local dev (recommended): Ollama + Qdrant
+
+This path uses `appsettings.Development.json` defaults:
+- **No API key required** (`ApiSecurity:RequireApiKey = false`)
+- **Ollama embeddings/LLM**
+- **Qdrant vector size 1024**
+
+#### 1) Start Qdrant
 
 ```bash
 docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
 ```
 
-### 2. Clone and Build
+#### 2) Install Ollama + pull models
+
+```bash
+ollama pull mxbai-embed-large
+ollama pull llama3.2:3b
+```
+
+#### 3) Clone and run DNFileRAG
 
 ```bash
 git clone https://github.com/MLidstrom/DNFileRAG.git
 cd DNFileRAG
-dotnet build
+dotnet run --project ./src/DNFileRAG
 ```
 
-### 3. Configure
+The API will be available at `http://localhost:8181` (Development).
 
-Edit `src/DNFileRAG/appsettings.json`:
+#### 4) Add documents
 
-```json
-{
-  "Qdrant": {
-    "Host": "localhost",
-    "Port": 6333,
-    "CollectionName": "DNFileRAG",
-    "VectorSize": 1024
-  },
-  "Embedding": {
-    "Provider": "Ollama",
-    "Ollama": {
-      "BaseUrl": "http://localhost:11434",
-      "Model": "mxbai-embed-large"
-    }
-  },
-  "Llm": {
-    "Provider": "Ollama",
-    "Ollama": {
-      "BaseUrl": "http://localhost:11434",
-      "Model": "llama3.2"
-    }
-  }
-}
-```
+Put files into:
+- **`src/DNFileRAG/data/documents/`**
 
-### 4. Run
+Supported extensions: `.pdf`, `.docx`, `.txt`, `.md`, `.html`
+
+> Want a different folder? Change `FileWatcher:WatchPath` in `src/DNFileRAG/appsettings.Development.json`.
+
+#### 5) Query the API
+
+- **cURL:**
 
 ```bash
-cd src/DNFileRAG
-dotnet run
+curl -X POST http://localhost:8181/api/query \
+  -H "Content-Type: application/json" \
+  -d "{\"query\":\"What are our support hours?\"}"
 ```
 
-The API will be available at `http://localhost:8181`
+- **PowerShell:**
 
-## API Endpoints
+```bash
+Invoke-RestMethod http://localhost:8181/api/query -Method Post -ContentType "application/json" -Body (@{ query = "What are our support hours?" } | ConvertTo-Json)
+```
+
+### HelpChat demo UI (mock company landing page + popup chat)
+
+HelpChat is a static page under `examples/HelpChat/` that shows a mock company landing page with a popup support chat.
+
+1) Start DNFileRAG (see above)
+2) Serve the folder:
+
+```bash
+cd examples/HelpChat
+python -m http.server 3000
+```
+
+3) Open `http://localhost:3000`
+
+> You can also open `examples/HelpChat/index.html` directly, but some browsers restrict `file://` requests.
+
+## API endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -137,13 +172,7 @@ API key authentication via `X-API-Key` header. Configure in `appsettings.json`:
 
 Set `RequireApiKey: false` for development (no key required).
 
-### Query Example
-
-```bash
-curl -X POST http://localhost:8181/api/query \
-  -H "Content-Type: application/json" \
-  -d '{"query": "What is the main topic of the documents?"}'
-```
+> Note: Development defaults already set `RequireApiKey: false` in `src/DNFileRAG/appsettings.Development.json`.
 
 ## Project Structure
 
@@ -215,26 +244,11 @@ Add to your `appsettings.json`:
 In your `Program.cs`:
 
 ```csharp
-using DNFileRAG.Core.Configuration;
-using DNFileRAG.Core.Interfaces;
-using DNFileRAG.Infrastructure.Embeddings;
-using DNFileRAG.Infrastructure.Llm;
-using DNFileRAG.Infrastructure.Services;
-using DNFileRAG.Infrastructure.VectorStore;
+using DNFileRAG;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Bind all configuration sections
-builder.Services.Configure<EmbeddingOptions>(builder.Configuration.GetSection("Embedding"));
-builder.Services.Configure<LlmOptions>(builder.Configuration.GetSection("Llm"));
-builder.Services.Configure<QdrantOptions>(builder.Configuration.GetSection("Qdrant"));
-builder.Services.Configure<RagOptions>(builder.Configuration.GetSection("Rag"));
-
-// Register DNFileRAG services
-builder.Services.AddEmbeddingServices();
-builder.Services.AddLlmProviders();
-builder.Services.AddHttpClient<IVectorStore, QdrantVectorStore>();
-builder.Services.AddSingleton<IRagEngine, RagEngine>();
+builder.Services.AddDNFileRAGServices(builder.Configuration);
 ```
 
 ### 4. Use in Your Code
@@ -330,24 +344,24 @@ DNFileRAG includes relevance score filtering to prevent off-topic queries:
 
 Queries with no documents above the threshold return a "no relevant information" response without calling the LLM, saving cost and preventing hallucination
 
-## Docker (Easiest Way)
+## Docker (self-contained local stack)
 
 Run DNFileRAG with a single command - no installation required except Docker:
 
 ```bash
-# Clone and start (first run downloads ~5GB of AI models)
+# Clone and start (first run downloads large AI models)
 git clone https://github.com/MLidstrom/DNFileRAG.git
 cd DNFileRAG
 docker-compose up -d
 
-# Put your documents here
+# Put your documents here (mapped into the container)
 mkdir -p documents
 cp /path/to/your/files/* documents/
 
 # Query via API
 curl -X POST http://localhost:8080/api/query \
   -H "Content-Type: application/json" \
-  -d '{"query": "What are the key topics in my documents?"}'
+  -d '{"query": "What are our support hours?"}'
 ```
 
 **What's included:**

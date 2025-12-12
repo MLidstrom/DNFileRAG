@@ -1,6 +1,6 @@
 # HelpChat Example
 
-A static HTML/TypeScript chat interface that connects to DNFileRAG API.
+A static mock company landing page with a popup support chat that connects to the DNFileRAG API.
 
 ## Files
 
@@ -17,8 +17,7 @@ HelpChat/
 ## Prerequisites
 
 - DNFileRAG API running on `http://localhost:8181`
-- Node.js (for TypeScript compilation)
-- Documents indexed in Qdrant
+- (Optional) Node.js (only if you want to modify `chat.ts` and recompile)
 
 ## Setup
 
@@ -29,35 +28,23 @@ cd src/DNFileRAG
 dotnet run
 ```
 
-### 2. Compile TypeScript
-
-```bash
-cd examples/HelpChat
-npx tsc
-```
-
-Or install TypeScript globally:
-
-```bash
-npm install -g typescript
-tsc
-```
-
-### 3. Serve the Page
+### 2. Serve the page
 
 Using Python:
 ```bash
+cd examples/HelpChat
 python -m http.server 3000
 ```
 
 Using Node.js:
 ```bash
+cd examples/HelpChat
 npx serve .
 ```
 
-Or simply open `index.html` in a browser (note: some browsers block local file CORS).
+Or open `index.html` directly (note: some browsers block `file://` requests to `http://localhost`).
 
-### 4. Open in Browser
+### 3. Open in browser
 
 Navigate to `http://localhost:3000`
 
@@ -73,10 +60,10 @@ new HelpChat('http://your-api-host:port');
 
 - Real-time connection status indicator
 - Typing indicator while waiting for response
-- Source citations with relevance scores
 - Response metadata (model, latency)
 - Error handling with user-friendly messages
-- Fully typed TypeScript client
+- Pop-up chat widget + resizable window (upper-left handle)
+- Fully typed TypeScript client (optional; `chat.js` is already included)
 
 ## API Endpoints Used
 
@@ -89,10 +76,7 @@ new HelpChat('http://your-api-host:port');
 
 ### Change the Company Name
 
-Edit `index.html`:
-```html
-<h1>Your Company Help Center</h1>
-```
+Edit `index.html` (topbar + hero copy).
 
 ### Adjust Query Parameters
 
@@ -104,4 +88,13 @@ const request: QueryRequest = {
     temperature: 0.5,   // More creative
     maxTokens: 1000     // Longer responses
 };
+```
+
+### If you change `chat.ts`
+
+Recompile:
+
+```bash
+cd examples/HelpChat
+npx tsc
 ```
