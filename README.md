@@ -115,12 +115,27 @@ The API will be available at `http://localhost:8181`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/documents` | List all indexed documents |
-| `POST` | `/api/documents/upload` | Upload a document for indexing |
-| `DELETE` | `/api/documents/{fileId}` | Remove a document from the index |
 | `POST` | `/api/query` | Query the RAG engine |
-| `POST` | `/api/reindex` | Trigger full reindex |
-| `GET` | `/health` | Health check |
+| `GET` | `/api/documents` | List all indexed documents |
+| `POST` | `/api/documents/reindex` | Trigger full reindex |
+| `DELETE` | `/api/documents?filePath=...` | Remove a document from the index |
+| `GET` | `/api/health` | Basic health check |
+| `GET` | `/api/health/detailed` | Detailed component health status |
+
+### Authentication
+
+API key authentication via `X-API-Key` header. Configure in `appsettings.json`:
+
+```json
+{
+  "ApiSecurity": {
+    "RequireApiKey": true,
+    "ApiKeys": ["your-api-key-here"]
+  }
+}
+```
+
+Set `RequireApiKey: false` for development (no key required).
 
 ### Query Example
 
