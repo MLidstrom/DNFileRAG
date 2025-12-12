@@ -23,6 +23,24 @@ cd DNFileRAG
 dotnet build
 ```
 
+## Testing
+
+### Fast (unit tests only)
+
+Skip Docker/Testcontainers integration tests:
+
+```bash
+dotnet test .\DNFileRAG.sln -c Release --filter "Category!=Integration"
+```
+
+### Full (includes integration tests)
+
+Runs everything (some tests start Docker containers via Testcontainers, so this is slower):
+
+```bash
+dotnet test .\DNFileRAG.sln -c Release
+```
+
 ## Features
 
 - **Real-time Document Ingestion** - Automatically watches directories and indexes new/modified documents

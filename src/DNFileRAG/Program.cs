@@ -1,5 +1,6 @@
 using Serilog;
 using DNFileRAG;
+using DNFileRAG.Auth;
 
 // Configure Serilog early for startup logging
 Log.Logger = new LoggerConfiguration()
@@ -17,11 +18,16 @@ try
     builder.Host.UseSerilog((context, services, configuration) => configuration
         .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services)
-        .Enrich.FromLogContext()
-        .WriteTo.Console());
+        .Enrich.FromLogContext());
 
     // Add controllers
     builder.Services.AddControllers();
+    builder.Services
+        .AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
+        .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+            ApiKeyAuthenticationHandler.SchemeName,
+            _ => { });
+    builder.Services.AddAuthorization();
 
     // Add OpenAPI/Swagger
     builder.Services.AddEndpointsApiExplorer();
@@ -62,6 +68,7 @@ try
 
     app.UseHttpsRedirection();
     app.UseCors();
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();

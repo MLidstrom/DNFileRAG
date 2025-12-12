@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
         services.Configure<ChunkingOptions>(configuration.GetSection(ChunkingOptions.SectionName));
         services.Configure<FileWatcherOptions>(configuration.GetSection(FileWatcherOptions.SectionName));
         services.Configure<RagOptions>(configuration.GetSection(RagOptions.SectionName));
+        services.Configure<ApiSecurityOptions>(configuration.GetSection(ApiSecurityOptions.SectionName));
 
         // Register core services
         services.AddSingleton<ITextChunker, TextChunker>();

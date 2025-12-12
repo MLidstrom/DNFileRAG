@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acme Corp - Help Center</title>
+    <title>Northwind Atlas - Customer Support</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,63 +13,441 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f7fafc;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 0;
+            color: #0f172a;
         }
 
-        .chat-container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        /* Landing page shell */
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 26px 20px 64px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            color: #f8fafc;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .logo-text strong {
+            font-size: 0.98rem;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logo-text span {
+            font-size: 0.82rem;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav a {
+            color: #334155;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 10px;
+            border-radius: 10px;
+        }
+
+        .nav a:hover {
+            background: #f1f5f9;
+        }
+
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #334155;
+            font-size: 0.88rem;
+        }
+
+        .cta-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #16a34a;
+        }
+
+        .hero {
+            margin-top: 26px;
+            padding: 42px 24px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 22px;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            color: #334155;
+            font-size: 1.02rem;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            appearance: none;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.05s ease, filter 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: #0ea5e9;
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(14, 165, 233, 0.18);
+        }
+
+        .btn-primary:hover { filter: brightness(1.03); }
+        .btn-primary:active { transform: translateY(1px); }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+
+        .btn-secondary:hover { background: #eaf0f7; }
+
+        .hero-card {
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            padding: 16px;
+        }
+
+        .hero-card h3 {
+            font-size: 0.92rem;
+            color: #0f172a;
+            font-weight: 650;
+            margin-bottom: 10px;
+        }
+
+        .hero-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hero-card li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            color: #334155;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .dot {
+            margin-top: 7px;
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #0ea5e9;
+            flex: 0 0 auto;
+        }
+
+        .sections {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .section h3 {
+            font-size: 0.95rem;
+            color: #0f172a;
+            font-weight: 650;
+            margin-bottom: 8px;
+        }
+
+        .section p {
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        footer {
+            margin-top: 18px;
+            color: #64748b;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 18px 0 0;
+        }
+
+        /* Chat widget (popup) */
+        .chat-launcher {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 50;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            cursor: pointer;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+        }
+
+        .chat-launcher .bubble {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: #0ea5e9;
+        }
+
+        .chat-launcher strong {
+            font-weight: 650;
+            font-size: 0.92rem;
+        }
+
+        .chat-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.18);
+        }
+
+        .chat-modal.open {
+            display: flex;
+        }
+
+        .chat-window {
+            width: 420px;
+            height: 560px;
+            min-width: 340px;
+            min-height: 420px;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 32px);
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Custom top-left resize handle (NW corner) */
+        .resize-handle-nw {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            cursor: nwse-resize;
+            z-index: 5;
+            display: grid;
+            place-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .resize-handle-nw::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid #64748b;
+            border-left: 2px solid #64748b;
+            border-radius: 2px;
+            transform: rotate(0deg);
+            opacity: 0.9;
+        }
+
+        .resize-handle-nw:hover {
+            background: #f1f5f9;
         }
 
         .chat-header {
-            background: #4f46e5;
-            color: white;
-            padding: 20px;
-            text-align: center;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 14px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: #0ea5e9;
+            box-shadow: 0 10px 24px rgba(14, 165, 233, 0.22);
+        }
+
+        .brand-text {
+            min-width: 0;
         }
 
         .chat-header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
+            font-size: 0.98rem;
+            font-weight: 650;
+            letter-spacing: 0.2px;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .chat-header p {
             opacity: 0.8;
-            font-size: 0.9rem;
+            font-size: 0.78rem;
+            margin: 2px 0 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .api-status {
-            font-size: 0.75rem;
-            margin-top: 8px;
-            padding: 4px 12px;
-            border-radius: 12px;
+            font-size: 0.78rem;
+            padding: 6px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.35);
+        }
+
+        .api-status::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
             display: inline-block;
+            background: rgba(148, 163, 184, 0.8);
         }
 
         .api-status.connected {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.35);
+            background: rgba(34, 197, 94, 0.12);
+            color: #86efac;
+        }
+
+        .api-status.connected::before {
+            background: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
         }
 
         .api-status.disconnected {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            border-color: rgba(248, 113, 113, 0.35);
+            background: rgba(248, 113, 113, 0.12);
+            color: #fecaca;
+        }
+
+        .api-status.disconnected::before {
+            background: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
         }
 
         .chat-messages {
-            height: 400px;
+            flex: 1;
+            min-height: 0; /* allow flex child to shrink */
             overflow-y: auto;
-            padding: 20px;
-            background: #f9fafb;
+            padding: 14px 14px 10px;
+            background: #f8fafc;
         }
 
         .message {
@@ -89,48 +467,35 @@
         .message-content {
             max-width: 80%;
             padding: 12px 16px;
-            border-radius: 12px;
+            border-radius: 14px;
             line-height: 1.5;
             white-space: pre-wrap;
+            box-shadow: 0 1px 0 rgba(15, 23, 42, 0.05);
         }
 
         .message.user .message-content {
-            background: #4f46e5;
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 6px;
         }
 
         .message.bot .message-content {
             background: white;
-            color: #1f2937;
+            color: #0f172a;
             border: 1px solid #e5e7eb;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message-sources {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-top: 8px;
-            padding: 8px;
-            background: #f3f4f6;
-            border-radius: 6px;
-            max-width: 80%;
-        }
-
-        .message-sources strong {
-            color: #4f46e5;
+            border-bottom-left-radius: 6px;
         }
 
         .message-meta {
-            font-size: 0.7rem;
-            color: #9ca3af;
+            font-size: 0.72rem;
+            color: #64748b;
             margin-top: 4px;
         }
 
         .chat-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
+            padding: 14px 18px 18px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
         }
 
         .chat-input-wrapper {
@@ -141,34 +506,36 @@
         #messageInput {
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #ffffff;
         }
 
         #messageInput:focus {
-            border-color: #4f46e5;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.14);
         }
 
         #sendButton {
             padding: 12px 24px;
-            background: #4f46e5;
+            background: #0ea5e9;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: transform 0.05s ease, filter 0.2s;
         }
 
         #sendButton:hover {
-            background: #4338ca;
+            filter: brightness(1.03);
         }
 
         #sendButton:disabled {
-            background: #9ca3af;
+            background: #94a3b8;
             cursor: not-allowed;
         }
 
@@ -177,8 +544,8 @@
             padding: 12px 16px;
             background: white;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            color: #6b7280;
+            border-radius: 14px;
+            color: #475569;
         }
 
         .typing-indicator span {
@@ -200,13 +567,14 @@
 
         .welcome-message {
             text-align: center;
-            color: #6b7280;
-            padding: 40px 20px;
+            color: #475569;
+            padding: 34px 14px;
         }
 
         .welcome-message h2 {
-            color: #1f2937;
+            color: #0f172a;
             margin-bottom: 10px;
+            font-weight: 650;
         }
 
         .error-message {
@@ -214,34 +582,211 @@
             border: 1px solid #fecaca;
             color: #dc2626;
             padding: 12px 16px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 16px;
+        }
+
+        .chat-close {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.35);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+        .chat-close:hover {
+            background: rgba(148, 163, 184, 0.14);
+        }
+
+        @media (max-width: 980px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .sections { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>Acme Corp Help Center</h1>
-            <p>Ask me anything about our products and services</p>
-            <div id="apiStatus" class="api-status disconnected">Checking API...</div>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-            <div class="welcome-message">
-                <h2>Welcome!</h2>
-                <p>How can I help you today?</p>
+    <div class="shell">
+        <header class="topbar">
+            <a class="logo" href="#" aria-label="Northwind Atlas">
+                <img class="logo-img" src="assets/northwind-atlas-logo.svg" alt="Northwind Atlas">
+            </a>
+            <nav class="nav" aria-label="Primary navigation">
+                <a href="#features">Features</a>
+                <a href="#security">Security</a>
+                <a href="#pricing">Pricing</a>
+            </nav>
+            <div class="cta" aria-label="Service status">
+                <span class="cta-badge" aria-hidden="true"></span>
+                <span>Support available 24/7</span>
             </div>
-        </div>
+        </header>
 
-        <div class="chat-input-container">
-            <div class="chat-input-wrapper">
-                <input type="text" id="messageInput" placeholder="Type your question..." autocomplete="off">
-                <button id="sendButton">Send</button>
+        <main class="hero">
+            <div class="hero-grid">
+                <div>
+                    <h1>Support that feels instant — without feeling automated.</h1>
+                    <p>Northwind Atlas helps customers get answers fast, resolve issues confidently, and stay productive. Tap the Help button to chat with support.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="button" id="openChatHero">Open Help Chat</button>
+                        <button class="btn btn-secondary" type="button" onclick="window.location.href='#features'">Explore features</button>
+                    </div>
+                </div>
+                <div class="hero-card" id="features">
+                    <h3>What you can ask</h3>
+                    <ul>
+                        <li><span class="dot" aria-hidden="true"></span><span>Account and billing questions</span></li>
+                        <li><span class="dot" aria-hidden="true"></span><span>Product usage and troubleshooting</span></li>
+                        <li><span class="dot" aria-hidden="true"></span><span>Setup guidance and best practices</span></li>
+                        <li><span class="dot" aria-hidden="true"></span><span>Security and compliance basics</span></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <section class="sections">
+            <div class="section" id="security">
+                <h3>Security-first</h3>
+                <p>Modern authentication and least-privilege access patterns to support enterprise readiness.</p>
+            </div>
+            <div class="section">
+                <h3>Fast responses</h3>
+                <p>Optimized to keep latency low and answers concise, with helpful follow-up questions.</p>
+            </div>
+            <div class="section" id="pricing">
+                <h3>Simple pricing</h3>
+                <p>Start small, scale as you grow. Talk to support for the right plan.</p>
+            </div>
+        </section>
+
+        <footer>
+            © <span id="year"></span> Northwind Atlas. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Chat launcher + modal (uses the same IDs expected by chat.js) -->
+    <button class="chat-launcher" id="openChat" type="button" aria-label="Open help chat">
+        <span class="bubble" aria-hidden="true"></span>
+        <strong>Help</strong>
+    </button>
+
+    <div class="chat-modal" id="chatModal" role="dialog" aria-modal="true" aria-label="Help chat">
+        <div class="chat-window">
+            <div class="resize-handle-nw" id="resizeHandleNW" title="Resize" aria-label="Resize chat"></div>
+            <div class="chat-header">
+                <div class="brand">
+                    <div class="brand-mark" aria-hidden="true"></div>
+                    <div class="brand-text">
+                        <h1>Northwind Support</h1>
+                        <p>Ask a question and we’ll help</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div id="apiStatus" class="api-status disconnected">Checking API...</div>
+                    <button class="chat-close" id="closeChat" type="button" aria-label="Close chat">Close</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages" aria-live="polite">
+                <div class="welcome-message">
+                    <h2>Hello</h2>
+                    <p>How can we help you today?</p>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Type your message…" autocomplete="off">
+                    <button id="sendButton">Send</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="chat.js"></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const modal = document.getElementById('chatModal');
+        const openBtn = document.getElementById('openChat');
+        const openHero = document.getElementById('openChatHero');
+        const closeBtn = document.getElementById('closeChat');
+        const input = document.getElementById('messageInput');
+        const chatWindow = modal.querySelector('.chat-window');
+        const resizeHandleNW = document.getElementById('resizeHandleNW');
+
+        function openChat() {
+            modal.classList.add('open');
+            if (input) input.focus();
+        }
+
+        function closeChat() {
+            modal.classList.remove('open');
+        }
+
+        openBtn.addEventListener('click', openChat);
+        openHero.addEventListener('click', openChat);
+        closeBtn.addEventListener('click', closeChat);
+
+        // Click outside the chat window closes the popup
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeChat();
+        });
+
+        // ESC closes the popup
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) closeChat();
+        });
+
+        // Custom resize from the upper-left corner.
+        // Because the modal is bottom-right aligned, changing width/height makes the window grow/shrink toward the upper-left.
+        (function enableResizeFromUpperLeft() {
+            if (!chatWindow || !resizeHandleNW) return;
+
+            const minW = 340;
+            const minH = 420;
+
+            function clamp(n, min, max) {
+                return Math.max(min, Math.min(max, n));
+            }
+
+            resizeHandleNW.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                resizeHandleNW.setPointerCapture(e.pointerId);
+
+                const rect = chatWindow.getBoundingClientRect();
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startW = rect.width;
+                const startH = rect.height;
+
+                // Use viewport-based max so we always stay on-screen.
+                const maxW = window.innerWidth - 32;
+                const maxH = window.innerHeight - 32;
+
+                function onMove(ev) {
+                    const dx = ev.clientX - startX;
+                    const dy = ev.clientY - startY;
+
+                    const newW = clamp(startW - dx, minW, maxW);
+                    const newH = clamp(startH - dy, minH, maxH);
+
+                    chatWindow.style.width = `${Math.round(newW)}px`;
+                    chatWindow.style.height = `${Math.round(newH)}px`;
+                }
+
+                function onUp(ev) {
+                    resizeHandleNW.releasePointerCapture(ev.pointerId);
+                    window.removeEventListener('pointermove', onMove);
+                    window.removeEventListener('pointerup', onUp);
+                    window.removeEventListener('pointercancel', onUp);
+                }
+
+                window.addEventListener('pointermove', onMove);
+                window.addEventListener('pointerup', onUp);
+                window.addEventListener('pointercancel', onUp);
+            });
+        })();
+    </script>
 </body>
 </html>

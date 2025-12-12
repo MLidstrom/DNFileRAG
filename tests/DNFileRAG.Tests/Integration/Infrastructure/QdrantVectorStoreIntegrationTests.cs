@@ -12,6 +12,7 @@ namespace DNFileRAG.Tests.Integration.Infrastructure;
 /// <summary>
 /// Integration tests for QdrantVectorStore using a real Qdrant container.
 /// </summary>
+[Trait("Category", "Integration")]
 [Collection("Qdrant")]
 public class QdrantVectorStoreIntegrationTests : IClassFixture<QdrantContainerFixture>, IAsyncLifetime
 {

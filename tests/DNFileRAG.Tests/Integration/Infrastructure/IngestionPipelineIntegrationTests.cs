@@ -14,6 +14,7 @@ namespace DNFileRAG.Tests.Integration.Infrastructure;
 /// Integration tests for the IngestionPipeline service testing the full
 /// document processing workflow with mocked external dependencies.
 /// </summary>
+[Trait("Category", "Integration")]
 public class IngestionPipelineIntegrationTests : IAsyncLifetime
 {
     private readonly string _testDirectory;

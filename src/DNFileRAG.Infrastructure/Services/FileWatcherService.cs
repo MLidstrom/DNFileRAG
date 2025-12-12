@@ -15,7 +15,6 @@ public class FileWatcherService : BackgroundService
 {
     private readonly FileWatcherOptions _options;
     private readonly IIngestionPipeline _ingestionPipeline;
-    private readonly IDocumentParserFactory _parserFactory;
     private readonly ILogger<FileWatcherService> _logger;
 
     private FileSystemWatcher? _watcher;
@@ -25,12 +24,10 @@ public class FileWatcherService : BackgroundService
     public FileWatcherService(
         IOptions<FileWatcherOptions> options,
         IIngestionPipeline ingestionPipeline,
-        IDocumentParserFactory parserFactory,
         ILogger<FileWatcherService> logger)
     {
         _options = options.Value;
         _ingestionPipeline = ingestionPipeline;
-        _parserFactory = parserFactory;
         _logger = logger;
 
         _supportedExtensions = _options.SupportedExtensions

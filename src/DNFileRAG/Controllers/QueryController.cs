@@ -1,6 +1,7 @@
 using DNFileRAG.Core.Interfaces;
 using DNFileRAG.Core.Models;
 using DNFileRAG.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DNFileRAG.Controllers;
@@ -10,6 +11,7 @@ namespace DNFileRAG.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "reader,admin")]
 public class QueryController : ControllerBase
 {
     private readonly IRagEngine _ragEngine;
@@ -22,7 +24,7 @@ public class QueryController : ControllerBase
     }
 
     /// <summary>
-    /// Process a RAG query and return an AI-generated answer with sources.
+    /// Process a RAG query and return an AI-generated answer.
     /// </summary>
     /// <param name="request">The query request.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -72,7 +74,8 @@ public class QueryController : ControllerBase
             }
         };
 
-        _logger.LogInformation("Query completed in {LatencyMs}ms with {SourceCount} sources",
+        // Avoid log spam and avoid "sources" wording; RagEngine already logs the retrieval count.
+        _logger.LogDebug("Query completed in {LatencyMs}ms (context chunks: {ContextChunkCount})",
             response.Metadata.LatencyMs, response.Sources.Count);
 
         return Ok(response);

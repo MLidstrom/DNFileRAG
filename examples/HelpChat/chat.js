@@ -49,12 +49,7 @@ class HelpChat {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
         let html = `<div class="message-content">${this.escapeHtml(content)}</div>`;
-        if (!isUser && sources.length > 0) {
-            const sourceList = sources
-                .map(s => `${s.fileName}${s.pageNumber ? ` (p.${s.pageNumber})` : ''} [${(s.score * 100).toFixed(0)}%]`)
-                .join(', ');
-            html += `<div class="message-sources"><strong>Sources:</strong> ${sourceList}</div>`;
-        }
+        // Intentionally do not display sources/citations in this demo UI.
         if (!isUser && metadata) {
             html += `<div class="message-meta">${metadata.model} | ${metadata.latencyMs}ms</div>`;
         }

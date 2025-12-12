@@ -78,6 +78,7 @@ public class QdrantVectorStore : IVectorStore
 
             // Create indexes for common filter fields
             await CreatePayloadIndexAsync(FieldFileId, "keyword", cancellationToken);
+            await CreatePayloadIndexAsync(FieldFilePath, "keyword", cancellationToken);
             await CreatePayloadIndexAsync(FieldIsActive, "bool", cancellationToken);
 
             _logger.LogInformation("Collection {CollectionName} created successfully", _options.CollectionName);
@@ -277,7 +278,7 @@ public class QdrantVectorStore : IVectorStore
         _logger.LogDebug("Getting document list from collection {CollectionName}", _options.CollectionName);
 
         var documents = new Dictionary<string, (string FilePath, string FileName, DateTime LastIndexed, int Count)>();
-        string? offset = null;
+        JsonElement? offset = null;
         const int limit = 100;
 
         while (true)
@@ -288,9 +289,9 @@ public class QdrantVectorStore : IVectorStore
                 ["with_payload"] = new[] { FieldFileId, FieldFilePath, FieldFileName, FieldUpdatedAt }
             };
 
-            if (offset != null)
+            if (offset is { ValueKind: not JsonValueKind.Null and not JsonValueKind.Undefined })
             {
-                scrollRequest["offset"] = offset;
+                scrollRequest["offset"] = offset.Value;
             }
 
             var response = await _httpClient.PostAsJsonAsync(
@@ -329,7 +330,7 @@ public class QdrantVectorStore : IVectorStore
             }
 
             offset = result?.Result?.NextPageOffset;
-            if (offset == null)
+            if (offset is not { ValueKind: not JsonValueKind.Null and not JsonValueKind.Undefined })
                 break;
         }
 
@@ -394,12 +395,12 @@ public class QdrantVectorStore : IVectorStore
         {
             if (filters.FilePaths.Length == 1)
             {
-                conditions.Add(new { key = FieldFilePath, match = new { text = filters.FilePaths[0] } });
+                conditions.Add(new { key = FieldFilePath, match = new { value = filters.FilePaths[0] } });
             }
             else
             {
                 var pathConditions = filters.FilePaths
-                    .Select(path => new { key = FieldFilePath, match = new { text = path } })
+                    .Select(path => new { key = FieldFilePath, match = new { value = path } })
                     .ToArray();
                 conditions.Add(new { should = pathConditions });
             }
@@ -485,7 +486,7 @@ public class QdrantVectorStore : IVectorStore
     {
         public List<QdrantScrollPoint>? Points { get; set; }
         [JsonPropertyName("next_page_offset")]
-        public string? NextPageOffset { get; set; }
+        public JsonElement? NextPageOffset { get; set; }
     }
 
     private class QdrantScrollPoint

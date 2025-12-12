@@ -1,5 +1,6 @@
 using DNFileRAG.Core.Interfaces;
 using DNFileRAG.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DNFileRAG.Controllers;
@@ -9,6 +10,7 @@ namespace DNFileRAG.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "reader,admin")]
 public class DocumentsController : ControllerBase
 {
     private readonly IVectorStore _vectorStore;
@@ -62,6 +64,7 @@ public class DocumentsController : ControllerBase
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of documents reindexed.</returns>
     [HttpPost("reindex")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ReindexResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ReindexResponse>> Reindex(CancellationToken cancellationToken)
@@ -82,6 +85,7 @@ public class DocumentsController : ControllerBase
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of vectors deleted.</returns>
     [HttpDelete]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(DeleteResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

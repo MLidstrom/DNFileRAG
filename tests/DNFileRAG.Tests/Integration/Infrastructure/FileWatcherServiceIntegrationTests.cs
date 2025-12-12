@@ -11,11 +11,11 @@ namespace DNFileRAG.Tests.Integration.Infrastructure;
 /// <summary>
 /// Integration tests for FileWatcherService using real file system operations.
 /// </summary>
+[Trait("Category", "Integration")]
 public class FileWatcherServiceIntegrationTests : IAsyncLifetime
 {
     private readonly string _testDirectory;
     private readonly Mock<IIngestionPipeline> _mockIngestionPipeline;
-    private readonly Mock<IDocumentParserFactory> _mockParserFactory;
     private FileWatcherService? _service;
     private CancellationTokenSource? _cts;
 
@@ -23,7 +23,6 @@ public class FileWatcherServiceIntegrationTests : IAsyncLifetime
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"DNFileRAG_Tests_{Guid.NewGuid():N}");
         _mockIngestionPipeline = new Mock<IIngestionPipeline>();
-        _mockParserFactory = new Mock<IDocumentParserFactory>();
     }
 
     public Task InitializeAsync()
@@ -69,7 +68,6 @@ public class FileWatcherServiceIntegrationTests : IAsyncLifetime
         return new FileWatcherService(
             options,
             _mockIngestionPipeline.Object,
-            _mockParserFactory.Object,
             NullLogger<FileWatcherService>.Instance);
     }
 
@@ -114,23 +112,25 @@ public class FileWatcherServiceIntegrationTests : IAsyncLifetime
         _service = CreateService();
         _cts = new CancellationTokenSource();
 
-        var processFileCalled = new TaskCompletionSource<string>();
-        var callCount = 0;
+        var processFileCalled = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var modificationWritten = false;
         _mockIngestionPipeline
             .Setup(x => x.ProcessFileAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Callback<string, CancellationToken>((path, _) =>
             {
-                callCount++;
-                if (callCount > 1) // Skip initial indexing
+                if (modificationWritten && string.Equals(path, testFile, StringComparison.OrdinalIgnoreCase))
+                {
                     processFileCalled.TrySetResult(path);
+                }
             })
             .ReturnsAsync(true);
 
         // Start the service
         _ = _service.StartAsync(_cts.Token);
-        await Task.Delay(500); // Allow service to initialize and perform initial indexing
+        await Task.Delay(250); // Allow service to initialize and set up watcher
 
         // Act - modify the file
+        modificationWritten = true;
         await File.WriteAllTextAsync(testFile, "Modified content");
 
         // Assert

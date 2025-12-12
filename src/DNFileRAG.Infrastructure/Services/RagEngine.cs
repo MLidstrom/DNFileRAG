@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using DNFileRAG.Core.Configuration;
 using DNFileRAG.Core.Interfaces;
 using DNFileRAG.Core.Models;
@@ -63,6 +64,13 @@ public class RagEngine : IRagEngine
         _logger.LogDebug("Searching vector store for top {TopK} results", topK);
         var searchResults = await _vectorStore.SearchAsync(queryEmbedding, topK, searchFilters, cancellationToken);
 
+        if (searchResults.Count > 0)
+        {
+            _logger.LogDebug("Raw vector search scores: min={MinScore:F3}, max={MaxScore:F3}",
+                searchResults.Min(r => r.Score),
+                searchResults.Max(r => r.Score));
+        }
+
         // Filter by minimum relevance score
         if (_options.MinRelevanceScore > 0)
         {
@@ -124,7 +132,7 @@ public class RagEngine : IRagEngine
             }
         };
 
-        _logger.LogInformation("RAG query completed in {LatencyMs}ms with {SourceCount} sources",
+        _logger.LogInformation("RAG query completed in {LatencyMs}ms with {ContextChunkCount} context chunks",
             response.Meta.LatencyMs, response.Sources.Count);
 
         return response;
@@ -157,8 +165,33 @@ public class RagEngine : IRagEngine
     /// </summary>
     private static string ApplyOutputGuardrails(string answer)
     {
-        // Basic sanitization - production systems should use content moderation APIs
-        return answer.Trim();
+        // Basic sanitization - production systems should use content moderation APIs.
+        // For this product/demo UX, we also avoid mentioning internal retrieval, documents, or sources.
+        var text = answer.Trim();
+
+        // Strip common citation formats
+        text = Regex.Replace(text, @"\s*\[\s*source\s*\d+\s*\]\s*", " ", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\(\s*source\s*\d+\s*\)", "", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bsource\s*\d+\b", "", RegexOptions.IgnoreCase);
+
+        // Strip common "meta" lead-in sentences that mention context/documents/sources
+        text = Regex.Replace(text,
+            @"^\s*(based on|according to)\s+the\s+(provided\s+)?(context|information)[^.\n]*[.\n]+\s*",
+            "",
+            RegexOptions.IgnoreCase);
+        text = Regex.Replace(text,
+            @"^\s*(based on|according to)\s+the\s+(provided\s+)?(context|information)\s+from\s+[^.\n]*[.\n]+\s*",
+            "",
+            RegexOptions.IgnoreCase);
+
+        // If the model still references documents/context, soften it.
+        text = Regex.Replace(text, @"\bindexed\s+documents?\b", "our information", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bprovided\s+context\b", "available information", RegexOptions.IgnoreCase);
+
+        // Clean up whitespace artifacts from removals
+        text = Regex.Replace(text, @"[ \t]{2,}", " ");
+        text = Regex.Replace(text, @"\n{3,}", "\n\n");
+        return text.Trim();
     }
 
     /// <summary>
@@ -185,29 +218,26 @@ public class RagEngine : IRagEngine
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine("Based on the following context from documents, please answer the question.");
+        sb.AppendLine("Answer the user’s question using ONLY the information below.");
+        sb.AppendLine("Do NOT mention sources, documents, context, snippets, citations, or retrieval.");
+        sb.AppendLine("If the information is insufficient, say: \"I don't have that information.\"");
         sb.AppendLine();
-        sb.AppendLine("=== CONTEXT ===");
+        sb.AppendLine("=== INFORMATION ===");
         sb.AppendLine();
 
         for (var i = 0; i < searchResults.Count; i++)
         {
             var result = searchResults[i];
-            sb.AppendLine($"[Source {i + 1}: {result.Metadata.FileName}");
-            if (result.Metadata.PageNumber.HasValue)
-            {
-                sb.Append($", Page {result.Metadata.PageNumber}");
-            }
-            sb.AppendLine($"]");
+            sb.AppendLine($"Item {i + 1}:");
             sb.AppendLine(result.Content);
             sb.AppendLine();
         }
 
-        sb.AppendLine("=== END CONTEXT ===");
+        sb.AppendLine("=== END INFORMATION ===");
         sb.AppendLine();
         sb.AppendLine("Question: " + query);
         sb.AppendLine();
-        sb.AppendLine("Please provide a comprehensive answer based on the context above. If the context doesn't contain relevant information, say so. Cite the source numbers (e.g., [Source 1]) when referencing specific information.");
+        sb.AppendLine("Provide a direct, customer-friendly answer. Do not include citations.");
 
         return sb.ToString();
     }
@@ -236,7 +266,7 @@ public class RagEngine : IRagEngine
         stopwatch.Stop();
         return new RagResponse
         {
-            Answer = "I couldn't find any relevant information in the indexed documents to answer your question. Please try rephrasing your question or ensure the relevant documents have been indexed.",
+            Answer = "Sorry — I don't have that information. Could you share a bit more detail so I can help?",
             Sources = [],
             Meta = new RagResponseMeta
             {
