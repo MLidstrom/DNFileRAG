@@ -2,15 +2,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy solution and project files
-COPY DNFileRAG.sln ./
+# Copy project files for restore
 COPY Directory.Build.props ./
 COPY src/DNFileRAG/DNFileRAG.csproj src/DNFileRAG/
 COPY src/DNFileRAG.Core/DNFileRAG.Core.csproj src/DNFileRAG.Core/
 COPY src/DNFileRAG.Infrastructure/DNFileRAG.Infrastructure.csproj src/DNFileRAG.Infrastructure/
 
-# Restore dependencies
-RUN dotnet restore
+# Restore dependencies (restore main project which pulls in dependencies)
+RUN dotnet restore src/DNFileRAG/DNFileRAG.csproj
 
 # Copy source code
 COPY src/ src/
