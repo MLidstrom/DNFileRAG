@@ -346,13 +346,14 @@
         }
 
         .chat-header {
-            background: #0f172a;
-            color: #f8fafc;
+            background: #ffffff;
+            color: #0f172a;
             padding: 14px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .brand {
@@ -382,10 +383,11 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #0f172a;
         }
 
         .chat-header p {
-            opacity: 0.8;
+            color: #64748b;
             font-size: 0.78rem;
             margin: 2px 0 0;
             white-space: nowrap;
@@ -407,8 +409,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.35);
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
         }
 
         .api-status::before {
@@ -417,13 +420,13 @@
             height: 8px;
             border-radius: 999px;
             display: inline-block;
-            background: rgba(148, 163, 184, 0.8);
+            background: #94a3b8;
         }
 
         .api-status.connected {
-            border-color: rgba(34, 197, 94, 0.35);
-            background: rgba(34, 197, 94, 0.12);
-            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.4);
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
         }
 
         .api-status.connected::before {
@@ -432,9 +435,9 @@
         }
 
         .api-status.disconnected {
-            border-color: rgba(248, 113, 113, 0.35);
-            background: rgba(248, 113, 113, 0.12);
-            color: #fecaca;
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
         }
 
         .api-status.disconnected::before {
@@ -474,9 +477,10 @@
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            background: #0ea5e9;
             color: white;
             border-bottom-right-radius: 6px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
         }
 
         .message.bot .message-content {
@@ -569,12 +573,15 @@
             text-align: center;
             color: #475569;
             padding: 34px 14px;
+            font-size: 0.95rem;
+            line-height: 1.55;
         }
 
         .welcome-message h2 {
             color: #0f172a;
             margin-bottom: 10px;
             font-weight: 650;
+            font-size: 1.25rem;
         }
 
         .error-message {
@@ -587,16 +594,17 @@
         }
 
         .chat-close {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.35);
-            color: #e2e8f0;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #334155;
             border-radius: 12px;
             padding: 8px 10px;
             cursor: pointer;
+            font-size: 0.88rem;
         }
 
         .chat-close:hover {
-            background: rgba(148, 163, 184, 0.14);
+            background: #f1f5f9;
         }
 
         @media (max-width: 980px) {
