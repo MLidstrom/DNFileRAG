@@ -7,7 +7,9 @@ A .NET 9-powered, real-time file-driven RAG (Retrieval-Augmented Generation) eng
 [![CI](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/MLidstrom/DNFileRAG/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/DNFileRAG.Infrastructure.svg)](https://www.nuget.org/packages/DNFileRAG.Infrastructure)
 
-[![Watch the demo](https://img.youtube.com/vi/6O5fafYHkAc/hqdefault.jpg)](https://youtu.be/6O5fafYHkAc)
+<a href="https://youtu.be/6O5fafYHkAc">
+  <img src="https://img.youtube.com/vi/6O5fafYHkAc/maxresdefault.jpg" alt="Watch the demo" width="600">
+</a>
 
 *Click to watch the demo video*
 
