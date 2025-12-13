@@ -1,6 +1,6 @@
 # DNFileRAG
 
-A .NET 9-powered, real-time file-driven RAG (Retrieval-Augmented Generation) engine that auto-ingests documents and serves fast, contextual query responses via API.
+A **.NET 9** real-time, file-driven **RAG (Retrieval-Augmented Generation)** engine that watches a folder, ingests documents, and serves fast answers over an HTTP API (with **Qdrant** vector search).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/)
@@ -13,116 +13,69 @@ A .NET 9-powered, real-time file-driven RAG (Retrieval-Augmented Generation) eng
 
 *Click to watch the demo video*
 
-## Installation
+## What you get
 
-### NuGet Package
+- **Real-time ingestion**: watches a folder and keeps your index up to date
+- **Formats**: `.pdf`, `.docx`, `.txt`, `.md`, `.html`
+- **Providers**: OpenAI / Azure OpenAI / Anthropic / Ollama (local)
+- **Vector store**: Qdrant
+- **API**: `/api/query`, `/api/documents`, `/api/health`
+- **Example UI**: mock company landing page + popup help chat (`examples/HelpChat`)
 
-```bash
-dotnet add package DNFileRAG.Infrastructure
-```
+## Choose your path
 
-### From Source
+- **Tutorial 1: Local dev (recommended)**: Ollama + Qdrant + `dotnet run` (fastest to try)
+- **Tutorial 2: HelpChat demo UI**: run a static page that calls your local API
+- **Tutorial 3: Docker deploy**: `docker-compose up -d` (self-contained stack)
+- **Tutorial 4: Testing**: fast vs integration tests
+- **Tutorial 5: Production tips**: hardening checklist
 
-```bash
-git clone https://github.com/MLidstrom/DNFileRAG.git
-cd DNFileRAG
-dotnet build
-```
+---
 
-## Testing
+## Tutorial 1 — Local dev (Ollama + Qdrant)
 
-### Fast (unit tests only)
+This uses the defaults in `src/DNFileRAG/appsettings.Development.json`:
+- API on `http://localhost:8181`
+- `ApiSecurity:RequireApiKey = false` (no key needed)
+- Embeddings + LLM via **Ollama**
+- Qdrant vector size **1024** (matches `mxbai-embed-large`)
 
-Skip Docker/Testcontainers integration tests:
-
-- **Windows (PowerShell):**
-
-```bash
-dotnet test .\DNFileRAG.sln -c Release --filter "Category!=Integration"
-```
-
-- **macOS/Linux (bash/zsh):**
-
-```bash
-dotnet test ./DNFileRAG.sln -c Release --filter "Category!=Integration"
-```
-
-### Full (includes integration tests)
-
-Runs everything (some tests start Docker containers via Testcontainers, so this is slower):
-
-- **Windows (PowerShell):**
-
-```bash
-dotnet test .\DNFileRAG.sln -c Release
-```
-
-- **macOS/Linux (bash/zsh):**
-
-```bash
-dotnet test ./DNFileRAG.sln -c Release
-```
-
-## Features
-
-- **Real-time Document Ingestion** - Automatically watches directories and indexes new/modified documents
-- **Multiple Document Formats** - Supports PDF, DOCX, TXT, MD, and HTML files
-- **Flexible Embedding Providers** - OpenAI, Azure OpenAI, or Ollama (local)
-- **Multiple LLM Providers** - OpenAI, Azure OpenAI, Anthropic, or Ollama (local)
-- **Vector Search** - Powered by Qdrant for fast semantic search
-- **REST API** - Simple API for queries and document management
-- **Clean Architecture** - Modular, testable, and extensible design
-
-## Quick Start
-
-### Prerequisites
-
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- [Qdrant](https://qdrant.tech/) vector database (Docker recommended)
-- One of: OpenAI API key, Azure OpenAI, or [Ollama](https://ollama.ai/) for local inference (recommended for local dev)
-
-### Local dev (recommended): Ollama + Qdrant
-
-This path uses `appsettings.Development.json` defaults:
-- **No API key required** (`ApiSecurity:RequireApiKey = false`)
-- **Ollama embeddings/LLM**
-- **Qdrant vector size 1024**
-
-#### 1) Start Qdrant
+### Step 1) Start Qdrant
 
 ```bash
 docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
 ```
 
-#### 2) Install Ollama + pull models
+### Step 2) Install Ollama + pull models
 
 ```bash
 ollama pull mxbai-embed-large
 ollama pull llama3.2:3b
 ```
 
-#### 3) Clone and run DNFileRAG
+### Step 3) Run DNFileRAG
 
 ```bash
-git clone https://github.com/MLidstrom/DNFileRAG.git
-cd DNFileRAG
 dotnet run --project ./src/DNFileRAG
 ```
 
-The API will be available at `http://localhost:8181` (Development).
-
-#### 4) Add documents
+### Step 4) Add documents
 
 Put files into:
-- **`src/DNFileRAG/data/documents/`**
+- `src/DNFileRAG/data/documents/`
 
-Supported extensions: `.pdf`, `.docx`, `.txt`, `.md`, `.html`
+If you want to watch a different folder, change `FileWatcher:WatchPath` in:
+- `src/DNFileRAG/appsettings.Development.json`
 
-> Want a different folder? Change `FileWatcher:WatchPath` in `src/DNFileRAG/appsettings.Development.json`.
+### Step 5) Verify indexing
 
-#### 5) Query the API
+```bash
+curl http://localhost:8181/api/documents
+```
 
-- **cURL:**
+### Step 6) Query
+
+- **cURL**
 
 ```bash
 curl -X POST http://localhost:8181/api/query \
@@ -130,57 +83,168 @@ curl -X POST http://localhost:8181/api/query \
   -d "{\"query\":\"What are our support hours?\"}"
 ```
 
-- **PowerShell:**
+- **PowerShell**
 
 ```bash
 Invoke-RestMethod http://localhost:8181/api/query -Method Post -ContentType "application/json" -Body (@{ query = "What are our support hours?" } | ConvertTo-Json)
 ```
 
-### HelpChat demo UI (mock company landing page + popup chat)
+---
 
-HelpChat is a static page under `examples/HelpChat/` that shows a mock company landing page with a popup support chat.
+## Tutorial 2 — HelpChat demo UI (landing page + popup chat)
 
-1) Start DNFileRAG (see above)
-2) Serve the folder:
+HelpChat is a static mock company page under `examples/HelpChat/` that opens a popup chat and calls your local DNFileRAG API.
+
+### Step 1) Start DNFileRAG
+
+Follow Tutorial 1 so the API is running at `http://localhost:8181`.
+
+### Step 2) Serve the static files
 
 ```bash
 cd examples/HelpChat
 python -m http.server 3000
 ```
 
-3) Open `http://localhost:3000`
+### Step 3) Open it
 
-> You can also open `examples/HelpChat/index.html` directly, but some browsers restrict `file://` requests.
+Open `http://localhost:3000` and click **Help**.
 
-## API endpoints
+> You can open `examples/HelpChat/index.html` directly, but some browsers restrict `file://` pages from calling `http://localhost`.
+
+---
+
+## Tutorial 3 — Docker deploy (self-contained stack)
+
+This uses `docker-compose.yml` to run:
+- Qdrant
+- Ollama
+- DNFileRAG API on `http://localhost:8080`
+
+### Step 1) Start the stack
+
+```bash
+docker-compose up -d
+```
+
+### Step 2) Add documents
+
+Files in `./documents` are mounted into the container at `/app/data/documents`:
+
+```bash
+mkdir -p documents
+cp /path/to/your/files/* documents/
+```
+
+### Step 3) Query
+
+```bash
+curl -X POST http://localhost:8080/api/query \
+  -H "Content-Type: application/json" \
+  -d '{"query":"What are our support hours?"}'
+```
+
+### Stop / reset
+
+```bash
+docker-compose down
+docker-compose down -v   # also removes Qdrant + Ollama volumes
+```
+
+---
+
+## Tutorial 4 — Testing
+
+### Fast tests (unit tests + fast checks)
+
+- **Windows (PowerShell)**
+
+```bash
+dotnet test .\DNFileRAG.sln -c Release --filter "Category!=Integration"
+```
+
+- **macOS/Linux (bash/zsh)**
+
+```bash
+dotnet test ./DNFileRAG.sln -c Release --filter "Category!=Integration"
+```
+
+### Full suite (includes integration tests)
+
+Integration tests may start Docker containers (Testcontainers) and will run slower.
+
+- **Windows (PowerShell)**
+
+```bash
+dotnet test .\DNFileRAG.sln -c Release
+```
+
+- **macOS/Linux (bash/zsh)**
+
+```bash
+dotnet test ./DNFileRAG.sln -c Release
+```
+
+### Note on FluentAssertions licensing
+
+Tests use **FluentAssertions**. If you plan commercial use, you may need a commercial license (see the warning emitted during test runs).
+
+---
+
+## Tutorial 5 — Production tips (checklist)
+
+### Security
+
+- **Enable API keys**: set `ApiSecurity:RequireApiKey = true` and configure `ApiSecurity:ApiKeys`.
+- **Run behind HTTPS**: terminate TLS at a reverse proxy (or configure Kestrel HTTPS). Ensure forwarded headers are configured if applicable.
+- **CORS**: lock down origins (avoid `AllowAnyOrigin()` for production).
+
+### Reliability
+
+- **Persist Qdrant**: store Qdrant data on durable storage (volumes/backups).
+- **Health checks**: use `/api/health` and `/api/health/detailed` for monitoring.
+- **Resource sizing**: embeddings + parsing can be CPU/RAM heavy; size accordingly.
+
+### Performance & quality
+
+- **Vector size must match your embedding model** (e.g., `mxbai-embed-large` → 1024).
+- **Tune chunking**: `Chunking:ChunkSize` and `Chunking:ChunkOverlap`.
+- **Tune retrieval**: `Rag:DefaultTopK` and `Rag:MinRelevanceScore`.
+
+### Ops
+
+- **Logging**: keep Production log levels at Info/Warn (Debug is noisy).
+- **Documents path**: ensure your `FileWatcher:WatchPath` points to the mounted directory in your environment.
+
+---
+
+## API reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/query` | Query the RAG engine |
-| `GET` | `/api/documents` | List all indexed documents |
+| `GET` | `/api/documents` | List indexed documents |
 | `POST` | `/api/documents/reindex` | Trigger full reindex |
 | `DELETE` | `/api/documents?filePath=...` | Remove a document from the index |
 | `GET` | `/api/health` | Basic health check |
 | `GET` | `/api/health/detailed` | Detailed component health status |
 
-### Authentication
+## Using as a NuGet package
 
-API key authentication via `X-API-Key` header. Configure in `appsettings.json`:
-
-```json
-{
-  "ApiSecurity": {
-    "RequireApiKey": true,
-    "ApiKeys": ["your-api-key-here"]
-  }
-}
+```bash
+dotnet add package DNFileRAG.Infrastructure
 ```
 
-Set `RequireApiKey: false` for development (no key required).
+Then register services:
 
-> Note: Development defaults already set `RequireApiKey: false` in `src/DNFileRAG/appsettings.Development.json`.
+```csharp
+using DNFileRAG;
 
-## Project Structure
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDNFileRAGServices(builder.Configuration);
+```
+
+## Project structure
 
 ```
 DNFileRAG/
@@ -188,211 +252,19 @@ DNFileRAG/
 │   ├── DNFileRAG/                 # Web API host
 │   ├── DNFileRAG.Core/            # Domain models & interfaces
 │   └── DNFileRAG.Infrastructure/  # External service implementations
-│       ├── Embeddings/            # Embedding providers
-│       ├── Llm/                   # LLM providers
-│       ├── Parsers/               # Document parsers
-│       ├── Services/              # Core services
-│       └── VectorStore/           # Qdrant integration
 ├── tests/
-│   └── DNFileRAG.Tests/           # Unit tests
+│   └── DNFileRAG.Tests/           # Test suite
 └── examples/
-    └── HelpChat/                  # Static HTML/TypeScript chat client
-```
-
-## Using as a NuGet Package
-
-Add DNFileRAG to your own .NET application to build custom RAG solutions.
-
-### 1. Install the Package
-
-```bash
-dotnet add package DNFileRAG.Infrastructure
-```
-
-### 2. Add Configuration
-
-Add to your `appsettings.json`:
-
-```json
-{
-  "Embedding": {
-    "Provider": "Ollama",
-    "Ollama": {
-      "BaseUrl": "http://localhost:11434",
-      "Model": "mxbai-embed-large"
-    }
-  },
-  "Llm": {
-    "Provider": "Ollama",
-    "Ollama": {
-      "BaseUrl": "http://localhost:11434",
-      "Model": "llama3.2"
-    }
-  },
-  "Qdrant": {
-    "Host": "localhost",
-    "Port": 6333,
-    "CollectionName": "documents",
-    "VectorSize": 1024
-  },
-  "Rag": {
-    "DefaultTopK": 5,
-    "DefaultTemperature": 0.2,
-    "DefaultMaxTokens": 512,
-    "MinRelevanceScore": 0.6,
-    "SystemPrompt": "You are a helpful assistant for our company. Answer questions based only on the provided context. Be concise and professional."
-  }
-}
-```
-
-### 3. Register Services
-
-In your `Program.cs`:
-
-```csharp
-using DNFileRAG;
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDNFileRAGServices(builder.Configuration);
-```
-
-### 4. Use in Your Code
-
-```csharp
-using DNFileRAG.Core.Interfaces;
-using DNFileRAG.Core.Models;
-
-public class MyService
-{
-    private readonly IRagEngine _ragEngine;
-
-    public MyService(IRagEngine ragEngine)
-    {
-        _ragEngine = ragEngine;
-    }
-
-    public async Task<RagResponse> AskAsync(string question)
-    {
-        var query = new RagQuery
-        {
-            Query = question,
-            TopK = 5,
-            Temperature = 0.2f,
-            MaxTokens = 512
-        };
-
-        return await _ragEngine.QueryAsync(query);
-    }
-}
-```
-
-The `IRagEngine` handles embedding generation, vector search, context building, and LLM prompting automatically using your configured `SystemPrompt`.
-
-### Available Providers
-
-| Provider | Embeddings | LLM | Local |
-|----------|:----------:|:---:|:-----:|
-| OpenAI | ✅ | ✅ | ❌ |
-| Azure OpenAI | ✅ | ✅ | ❌ |
-| Anthropic | ❌ | ✅ | ❌ |
-| Ollama | ✅ | ✅ | ✅ |
-
-## Configuration
-
-### Embedding Providers
-
-| Provider | Config Key | Requirements |
-|----------|------------|--------------|
-| OpenAI | `OpenAI` | API Key |
-| Azure OpenAI | `AzureOpenAI` | Endpoint, API Key, Deployment |
-| Ollama | `Ollama` | Local Ollama instance |
-
-### LLM Providers
-
-| Provider | Config Key | Requirements |
-|----------|------------|--------------|
-| OpenAI | `OpenAI` | API Key |
-| Azure OpenAI | `AzureOpenAI` | Endpoint, API Key, Deployment |
-| Anthropic | `Anthropic` | API Key |
-| Ollama | `Ollama` | Local Ollama instance |
-
-### Local Development with Ollama
-
-For fully local development without API keys:
-
-1. Install [Ollama](https://ollama.ai/)
-2. Pull required models:
-   ```bash
-   ollama pull mxbai-embed-large  # Recommended: 1024 dims, stable
-   ollama pull llama3.2
-   ```
-3. Set providers to `Ollama` in configuration
-4. Configure vector size to match embedding model:
-
-| Embedding Model | Vector Size | Notes |
-|-----------------|-------------|-------|
-| `mxbai-embed-large` | 1024 | Recommended for stability |
-| `nomic-embed-text` | 768 | May crash on some PDFs (Ollama Windows bug) |
-| `all-minilm` | 384 | Smaller, faster |
-
-### Query Guardrails
-
-DNFileRAG includes relevance score filtering to prevent off-topic queries:
-
-```json
-{
-  "Rag": {
-    "MinRelevanceScore": 0.6
-  }
-}
-```
-
-Queries with no documents above the threshold return a "no relevant information" response without calling the LLM, saving cost and preventing hallucination
-
-## Docker (self-contained local stack)
-
-Run DNFileRAG with a single command - no installation required except Docker:
-
-```bash
-# Clone and start (first run downloads large AI models)
-git clone https://github.com/MLidstrom/DNFileRAG.git
-cd DNFileRAG
-docker-compose up -d
-
-# Put your documents here (mapped into the container)
-mkdir -p documents
-cp /path/to/your/files/* documents/
-
-# Query via API
-curl -X POST http://localhost:8080/api/query \
-  -H "Content-Type: application/json" \
-  -d '{"query": "What are our support hours?"}'
-```
-
-**What's included:**
-- Qdrant (vector database)
-- Ollama (local LLM - no API keys needed)
-- DNFileRAG API
-- Auto-downloads AI models on first start
-
-**Endpoints:**
-- API: http://localhost:8080
-- Health: http://localhost:8080/api/health
-
-**Stop/Remove:**
-```bash
-docker-compose down        # Stop services
-docker-compose down -v     # Stop and remove data
+    └── HelpChat/                  # Mock landing page + popup support chat
 ```
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see `CONTRIBUTING.md` for guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License — see `LICENSE`.
 
 ## Acknowledgments
 
@@ -400,3 +272,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Serilog](https://serilog.net/) - Structured logging
 - [PdfPig](https://github.com/UglyToad/PdfPig) - PDF parsing
 - [DocumentFormat.OpenXml](https://github.com/OfficeDev/Open-XML-SDK) - DOCX parsing
+
+

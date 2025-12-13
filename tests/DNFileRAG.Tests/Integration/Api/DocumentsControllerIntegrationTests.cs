@@ -12,6 +12,7 @@ namespace DNFileRAG.Tests.Integration.Api;
 /// <summary>
 /// Integration tests for the Documents API endpoints.
 /// </summary>
+[Trait("Category", "Integration")]
 public class DocumentsControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;

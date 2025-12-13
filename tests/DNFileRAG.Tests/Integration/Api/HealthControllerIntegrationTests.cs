@@ -9,6 +9,7 @@ namespace DNFileRAG.Tests.Integration.Api;
 /// <summary>
 /// Integration tests for the Health API endpoints.
 /// </summary>
+[Trait("Category", "Integration")]
 public class HealthControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;

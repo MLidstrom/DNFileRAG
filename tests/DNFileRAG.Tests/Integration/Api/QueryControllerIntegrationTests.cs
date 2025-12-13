@@ -11,6 +11,7 @@ namespace DNFileRAG.Tests.Integration.Api;
 /// <summary>
 /// Integration tests for the Query API endpoints.
 /// </summary>
+[Trait("Category", "Integration")]
 public class QueryControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
