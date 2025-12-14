@@ -16,7 +16,7 @@ A **.NET 9** real-time, file-driven **RAG (Retrieval-Augmented Generation)** eng
 ## What you get
 
 - **Real-time ingestion**: watches a folder and keeps your index up to date
-- **Formats**: `.pdf`, `.docx`, `.txt`, `.md`, `.html`
+- **Formats**: `.pdf`, `.docx`, `.txt`, `.md`, `.html`, `.png`, `.jpg`, `.jpeg`, `.webp`
 - **Providers**: OpenAI / Azure OpenAI / Anthropic / Ollama (local)
 - **Vector store**: Qdrant
 - **API**: `/api/query`, `/api/documents`, `/api/health`
@@ -51,7 +51,10 @@ docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
 ```bash
 ollama pull mxbai-embed-large
 ollama pull llama3.2:3b
+ollama pull llava
 ```
+
+> Images: Vision extraction is enabled by default in Development via `Vision:Enabled=true` and uses the Ollama model `llava` (configurable).
 
 ### Step 3) Run DNFileRAG
 

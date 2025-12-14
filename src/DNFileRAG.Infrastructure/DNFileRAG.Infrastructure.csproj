@@ -7,7 +7,7 @@
 
     <!-- NuGet Package Properties -->
     <PackageId>DNFileRAG.Infrastructure</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>DNFileRAG Contributors</Authors>
     <Description>A .NET RAG (Retrieval-Augmented Generation) engine with support for multiple embedding and LLM providers, document parsing, and vector search</Description>
     <PackageTags>rag;ai;embeddings;vector-search;llm;dotnet;openai;ollama;anthropic;qdrant</PackageTags>

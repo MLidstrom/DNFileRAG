@@ -33,7 +33,10 @@ public class ConfigurationOptionsTests
         // Assert
         options.WatchPath.Should().Be("/app/data/documents");
         options.IncludeSubdirectories.Should().BeTrue();
-        options.SupportedExtensions.Should().BeEquivalentTo([".pdf", ".docx", ".txt", ".md", ".html"]);
+        options.SupportedExtensions.Should().BeEquivalentTo([
+            ".pdf", ".docx", ".txt", ".md", ".html",
+            ".png", ".jpg", ".jpeg", ".webp"
+        ]);
         options.DebounceMilliseconds.Should().Be(500);
     }
 
@@ -231,5 +234,34 @@ public class ConfigurationOptionsTests
         options.ApiKeys.Should().HaveCount(2);
         options.ApiKeys[0].Role.Should().Be("reader");
         options.ApiKeys[1].Role.Should().Be("admin");
+    }
+
+    [Fact]
+    public void VisionOptions_ShouldHaveCorrectDefaults()
+    {
+        // Arrange & Act
+        var options = new VisionOptions();
+
+        // Assert
+        options.Enabled.Should().BeFalse();
+        options.Provider.Should().Be("Ollama");
+        options.Ollama.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void VisionOptions_SectionName_ShouldBeCorrect()
+    {
+        VisionOptions.SectionName.Should().Be("Vision");
+    }
+
+    [Fact]
+    public void OllamaVisionOptions_ShouldHaveCorrectDefaults()
+    {
+        // Arrange & Act
+        var options = new OllamaVisionOptions();
+
+        // Assert
+        options.BaseUrl.Should().Be("http://localhost:11434");
+        options.Model.Should().Be("llava");
     }
 }

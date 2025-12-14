@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.Configure<FileWatcherOptions>(configuration.GetSection(FileWatcherOptions.SectionName));
         services.Configure<RagOptions>(configuration.GetSection(RagOptions.SectionName));
         services.Configure<ApiSecurityOptions>(configuration.GetSection(ApiSecurityOptions.SectionName));
+        services.Configure<VisionOptions>(configuration.GetSection(VisionOptions.SectionName));
 
         // Register core services
         services.AddSingleton<ITextChunker, TextChunker>();
@@ -37,7 +38,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDocumentParser, HtmlParser>();
         services.AddSingleton<IDocumentParser, PdfParser>();
         services.AddSingleton<IDocumentParser, DocxParser>();
+        services.AddSingleton<IDocumentParser, ImageParser>();
         services.AddSingleton<IDocumentParserFactory, DocumentParserFactory>();
+
+        // Register vision extraction (used by ImageParser)
+        services.AddHttpClient<IVisionTextExtractor, OllamaVisionTextExtractor>();
 
         // Register embedding services using existing extension
         services.AddEmbeddingServices();
